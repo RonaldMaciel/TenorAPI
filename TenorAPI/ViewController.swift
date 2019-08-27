@@ -12,15 +12,28 @@ class ViewController: UIViewController {
     let request = Request()
     var gifs : [Any] = []
     
+    
+    let dispatchGroup = DispatchGroup()
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DispatchQueue.main.async {
+        
+        
+        DispatchQueue.global().async {
+            
+            self.dispatchGroup.enter()
+            
+            print("First request started")
             self.loadGif {
+                self.dispatchGroup.leave()
                 print("terminou")
             }
         }
     }
+    
     
     
     
