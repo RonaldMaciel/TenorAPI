@@ -21,6 +21,10 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         
+        dispatchGroup.notify(queue: .main) {
+            //quando completar
+        }
+        
         
         DispatchQueue.global().async {
             
@@ -28,10 +32,13 @@ class ViewController: UIViewController {
             
             print("First request started")
             self.loadGif {
-                self.dispatchGroup.leave()
                 print("terminou")
+                self.dispatchGroup.leave()
+                
             }
         }
+        
+        DIs
     }
     
     

@@ -49,7 +49,7 @@ struct URLGif: Codable{
 
 
 class Request {
-    let url = URL(string: "https://api.tenor.com/v1/search?q=excited&key=NXETZHW6WDI9&limit=8")
+    let url = URL(string: "https://api.tenor.com/v1/search?q=excited&key=NXETZHW6WDI9&limit=50")
     
     func getGifURL(completion: @escaping ([URLGif]) -> () ) {
         
