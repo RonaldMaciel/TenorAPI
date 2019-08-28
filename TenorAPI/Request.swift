@@ -51,9 +51,11 @@ struct URLGif: Codable{
 class Request {
     let url = URL(string: "https://api.tenor.com/v1/search?q=excited&key=NXETZHW6WDI9&limit=50")
     
+    let trending_url = URL(string: "https://api.tenor.com/v1/trending?key=NXETZHW6WDI9&limit=8")
+    
     func getGifURL(completion: @escaping ([URLGif]) -> () ) {
         
-        if let url = self.url {
+        if let url = self.trending_url {
             let task = URLSession.shared.dataTask(with: url) {(nsData, urlResponse, error) in
                 var urlGifs: [URLGif] = []
                 
@@ -63,13 +65,17 @@ class Request {
                             let decoder = JSONDecoder()
                             let response = try? decoder.decode(Results.self, from: backData)
                             
-                            let renan = response?.results ?? []
                             
-                            for media in renan{
-                                for tinyGif in media.media {
-                                    urlGifs.append(tinyGif.tinyGif)
+                            
+                            if let renan = response?.results {
+                                for media in renan{
+                                    for tinyGif in media.media {
+                                        urlGifs.append(tinyGif.tinyGif)
+                                    }
                                 }
                             }
+                            
+                           
                         } catch {
                             print(error.localizedDescription)
                         }
