@@ -10,10 +10,9 @@ import UIKit
 
 class ViewController: UIViewController {
     let request = Request()
-    var gifs : [URLGif] = []
+    var gifs: [URLGif] = []
     
-    
-    let dispatchGroup = DispatchGroup()
+    let dispatchSemaphore = DispatchSemaphore(value: 1)
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -25,34 +24,37 @@ class ViewController: UIViewController {
         self.tableView.dataSource = self
         
         
-        
-        
-        DispatchQueue.global(qos: .unspecified).async {
+        DispatchQueue.global(qos: .background).async {
             
-            self.dispatchGroup.enter()
-            
-            print("First request started")
+            self.dispatchSemaphore.wait()
+            print("First Request Started")
             self.loadGif {
-                print("terminou")
-                self.dispatchGroup.leave()
+                print("Done!")
+                self.dispatchSemaphore.signal()
             }
             
-            self.dispatchGroup.notify(queue: .main) {
-                //quando completar
-                
-                print("acabou tudo")
+            
+            self.dispatchSemaphore.wait()
+            DispatchQueue.main.async {
                 self.tableView.reloadData()
+                print("Finished")
+                self.dispatchSemaphore.signal()
             }
+            
+            
         }
+        
     }
     
     
     func loadGif(callback: @escaping () -> Void) {
-        request.getGifURL { (gifs) in
+        self.request.getGifURL { (gifs) in
             self.gifs = gifs
             callback()
         }
     }
+    
+    
     
     
 }
@@ -65,6 +67,7 @@ extension ViewController : UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        
         if let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? TableViewCell {
             
             let gif_url = gifs[indexPath.row].url
@@ -73,6 +76,7 @@ extension ViewController : UITableViewDelegate, UITableViewDataSource {
             
             return cell
         }
+        
         
         return UITableViewCell()
         
@@ -96,12 +100,20 @@ extension UIImageView {
     }
     
     
-    func loadGif(url: String){
-        DispatchQueue.global().async { [weak self] in
-            
-        }
-    }
 }
 
+
+
+//extension UIImage {
+//
+//    public class func gif(data: Data) -> UIImage? {
+//        // Create source from data
+//        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+//            print("SwiftGif: Source for the image does not exist")
+//            return nil
+//        }
+//
+//        return UIImage.animatedImageWithSource(source)
+//}
 
 
